@@ -11,7 +11,7 @@ class User(base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(128), unique=True, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column(String(128), nullable=False)
     create_at = Column(DateTime(timezone=True), server_default=func.now())
 
     spending = relationship('Finance', back_populates='user')

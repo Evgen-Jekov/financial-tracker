@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, EmailStr, field_validator
+from datetime import datetime
 import re
 
 class UserBase(BaseModel):
@@ -12,6 +13,7 @@ class UserResponses(UserBase):
 
 class UserCreate(UserBase):
     password : str = Field(min_length=8, max_length=128)
+    create_at : datetime
 
     @field_validator('password')
     def validate_password(cls, value):

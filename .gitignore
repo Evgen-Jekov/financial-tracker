@@ -3,3 +3,4 @@
 alembic
 .venv
 __pycache__
+alembic.ini

@@ -8,18 +8,23 @@ class UserBase(BaseModel):
 
 
 class UserResponses(UserBase):
-    pass
+    create_at : datetime
+
+    class Config:
+        from_attributes = True
 
 
 class UserCreate(UserBase):
     password : str = Field(min_length=8, max_length=128)
-    create_at : datetime
 
     @field_validator('password')
     def validate_password(cls, value):
-        response = bool(re.fullmatch(pattern=r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$'), value)
+        response = bool(re.fullmatch(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$', value))
 
         if response == False:
             raise ValueError('Invalid password or username')
         
         return value
+    
+    class Config:
+        from_attributes = True

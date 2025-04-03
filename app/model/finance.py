@@ -10,7 +10,7 @@ class Finance(base):
     id = Column(Integer, primary_key=True, index=True)
     name_of_the_expenditure = Column(String(128), nullable=False)
     amount = Column(Integer, nullable=False)
-    create_at = Column(DateTime, server_default=func.now())
+    create_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='spending')

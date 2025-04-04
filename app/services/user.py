@@ -2,7 +2,7 @@ import jwt
 import os
 from fastapi import Depends, HTTPException, status
 from app.model.database import get_db
-from app.model.user import User
+from app.model.model import User
 from app.schemas.schemas_user import UserCreate
 from app.schemas.token import Token
 from sqlalchemy.orm import Session

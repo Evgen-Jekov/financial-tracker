@@ -6,9 +6,10 @@ from app.model.model import User
 from app.schemas.schemas_user import UserCreate
 from app.schemas.token import Token
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from passlib.context import CryptContext
 from dotenv import load_dotenv
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from datetime import timedelta, datetime, timezone
 
 load_dotenv()
@@ -50,10 +51,30 @@ def authenticate_user(data_user : UserCreate, db : Session = Depends(get_db)) ->
     if not verify_password(data_user.password, check.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='innocorect username or password')
     
-    token_access = create_access_token(data={"sub" : data_user.username}, expires_delta=ACCESS_TOKEN_EXPIRE_MINUTES)
+    token_access = create_access_token(data={"sub" : data_user.username}, 
+                                       expires_delta=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     return Token(
         access_token=token_access,
         token_type="bearer"
     )
-    
+
+def create_user(data_user : UserCreate, db : Session = Depends(get_db)):
+    try:
+        password = get_password_hash(data_user.password)
+
+        new_user = User(username=data_user.username, 
+                        password=password, 
+                        email=data_user.email)
+
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        token = create_access_token(data={"sub" : data_user.username}, 
+                                       expires_delta=ACCESS_TOKEN_EXPIRE_MINUTES)
+
+        return {'user' : new_user, 'token' : token}
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

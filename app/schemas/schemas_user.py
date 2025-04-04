@@ -7,7 +7,14 @@ class UserBase(BaseModel):
     email : EmailStr = Field(min_length=8, max_length=128)
 
 
-class UserResponses(UserBase):
+class UserObsolete(UserBase):
+    create_at : datetime
+
+    class Config:
+        from_attributes = True
+
+class UserResponses(BaseModel):
+    token : str
     create_at : datetime
 
     class Config:

@@ -56,7 +56,4 @@ def authenticate_user(data_user : UserCreate, db : Session = Depends(get_db)) ->
         access_token=token_access,
         token_type="bearer"
     )
-
-
-def get_current_user()
     

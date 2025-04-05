@@ -24,15 +24,25 @@ def login_user(form_data : OAuth2PasswordRequestForm = Depends(), db : Session =
 
     token = authenticate_user(data_user=data_user, db=db)
 
-    return {'user' : UserResponses(data_user.__dict__), 'token' : token}
+    return UserResponses(
+        token=token['token'].access_token,
+        create_at=token["user"].create_at,
+        username=token["user"].username,
+        email=token["user"].email
+    )
 
-@route_user.post('/register', response_class=UserResponses)
+@route_user.post('/register', response_model=UserResponses)
 def register_user(data_user : UserCreate, db : Session = Depends(get_db)):
-    check = db.query(User).filter(User.email == data_user.email).first
-    
-    if check:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already create')
-    
+    check = db.query(User).filter(User.email == data_user.email).first()
+
+    if check != None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='user already exist')
+
     user = create_user(data_user=data_user, db=db)
 
-    return user
+    return UserResponses(
+        token=user["token"],
+        create_at=user["user"].create_at,
+        username=user["user"].username,
+        email=user["user"].email
+    )

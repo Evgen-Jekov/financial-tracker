@@ -54,10 +54,7 @@ def authenticate_user(data_user : UserCreate, db : Session = Depends(get_db)) ->
     token_access = create_access_token(data={"sub" : data_user.username}, 
                                        expires_delta=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    return Token(
-        access_token=token_access,
-        token_type="bearer"
-    )
+    return {'token' : Token(access_token=token_access, token_type="bearer"), 'user' : check}
 
 def create_user(data_user : UserCreate, db : Session = Depends(get_db)):
     try:

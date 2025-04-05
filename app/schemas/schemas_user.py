@@ -16,6 +16,8 @@ class UserObsolete(UserBase):
 class UserResponses(BaseModel):
     token : str
     create_at : datetime
+    username : str = Field(min_length=3, max_length=50)
+    email : EmailStr = Field(min_length=8, max_length=128)
 
     class Config:
         from_attributes = True

@@ -6,13 +6,6 @@ class UserBase(BaseModel):
     username : str = Field(min_length=3, max_length=50)
     email : EmailStr = Field(min_length=8, max_length=128)
 
-
-class UserObsolete(UserBase):
-    create_at : datetime
-
-    class Config:
-        from_attributes = True
-
 class UserResponses(BaseModel):
     token : str
     create_at : datetime

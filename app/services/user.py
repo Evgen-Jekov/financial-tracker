@@ -92,7 +92,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Annotate
 
         user = db.query(User).filter(User.username == username).first()
         if not user:
-            raise error
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
         
         return user
 

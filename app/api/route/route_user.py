@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Depends, HTTPException, status, Body, Path
 from fastapi.security import OAuth2PasswordRequestForm
 from app.model.database import get_db
 from app.model.model import User
@@ -50,27 +50,23 @@ def register_user(data_user : UserCreate,
 
     return result_user
 
-@route_user.get(path='/get-user/{username}', response_model=UserResponses)
+@route_user.post(path='/get-user/{id}', response_model=UserResponses)
 def get_user_data(
     token: Annotated[str, Depends(oauth2_scheme)], 
     db: Annotated[Session, Depends(get_db)], 
-    username: Annotated[str, Path(min_length=5, max_length=50)]
+    id: Annotated[int, Path(gt=0)]
 ):
     current_user = get_current_user(token=token, db=db)
 
-    if current_user.username != username:
+    if current_user.id != id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are not authorized to view this user")
 
-    user = get_user(username=username, db=db)  # Передаем username, а не id
-
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
     result_user = UserResponses(
         token=token,
-        create_at=user.create_at,
-        email=user.email,
-        username=user.username
+        create_at=current_user.create_at,
+        email=current_user.email,
+        username=current_user.username
     )
 
     return result_user

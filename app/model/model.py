@@ -21,6 +21,7 @@ class Finance(base):
     __tablename__ = 'finances'
 
     id = Column(Integer, primary_key=True, index=True)
+    category = Column(String(100), nullable=False)
     name_of_the_expenditure = Column(String(128), nullable=False)
     amount = Column(Integer, nullable=False)
     create_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -20,8 +20,6 @@ SECRET_KEY = os.getenv('JWT')
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = timedelta(minutes=15)
 pwd_context = CryptContext(['bcrypt'], deprecated='auto')
-
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/user/login')
 
 def verify_password(plain_password, password_hash):
@@ -78,27 +76,27 @@ def create_user(data_user : UserCreate, db : Annotated[Session, Depends(get_db)]
         db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
-def get_user(id: int, db: Annotated[Session, Depends(get_db)]):
-    user = db.query(User).filter(User.id == id).first()
+def get_user(username: str, db: Annotated[Session, Depends(get_db)]):
+    user = db.query(User).filter(User.username == username).first()
     return user
 
-def get_current_user( token: Annotated[str, Depends(oauth2_scheme)], 
-                     db : Annotated[Session, Depends(get_db)], id : int):
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Annotated[Session, Depends(get_db)]):
     error = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalid")
     
     try:
-        pyload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = pyload.get("sub")
-        user = db.query(User).filter(User.username == username).first()
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
 
         if not username:
-            raise error
-        
-        if user is None:
-            raise error
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not auth')
 
-        return user
+        user = db.query(User).filter(User.username == username).first()
+        if not user:
+            raise error
         
+        return user
+
     except InvalidTokenError as e:
         raise error
+
         

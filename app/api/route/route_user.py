@@ -4,13 +4,14 @@ from app.model.database import get_db
 from app.model.model import User
 from app.services.user import authenticate_user, create_user, oauth2_scheme, get_current_user, get_user
 from app.schemas.schemas_user import UserCreate, UserResponses
+from app.schemas.token import Token
 from sqlalchemy.orm import Session
 from typing import Annotated
 
 route_user = APIRouter(prefix='/user', tags=['USER'])
 
 
-@route_user.post(path='/login', response_model=UserResponses)
+@route_user.post(path='/login', response_model=Token)
 def login_user(form_data : Annotated[OAuth2PasswordRequestForm, Depends()], 
                db : Annotated[Session, Depends(get_db)]):
     email = db.query(User).filter(User.username == form_data.username).first()
@@ -26,14 +27,8 @@ def login_user(form_data : Annotated[OAuth2PasswordRequestForm, Depends()],
 
     token = authenticate_user(data_user=data_user, db=db)
 
-    user = UserResponses(
-        token=token['token'].access_token,
-        create_at=token["user"].create_at,
-        username=token["user"].username,
-        email=token["user"].email
-    )
 
-    return user
+    return token['token']
 
 @route_user.post('/register', response_model=UserResponses)
 def register_user(data_user : UserCreate, 
@@ -55,18 +50,18 @@ def register_user(data_user : UserCreate,
 
     return result_user
 
-
+@route_user.get(path='/get-user/{username}', response_model=UserResponses)
 def get_user_data(
     token: Annotated[str, Depends(oauth2_scheme)], 
     db: Annotated[Session, Depends(get_db)], 
-    id: Annotated[int, Path(gt=0)]
+    username: Annotated[str, Path(min_length=5, max_length=50)]
 ):
     current_user = get_current_user(token=token, db=db)
 
-    if current_user.id != id:
+    if current_user.username != username:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are not authorized to view this user")
 
-    user = get_user(id=id, db=db)
+    user = get_user(username=username, db=db)  # Передаем username, а не id
 
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

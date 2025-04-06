@@ -20,6 +20,10 @@ def add_finance(finance : FinanceCreate,
         if data_user.id != finance.user_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='You are not authorized to view this user')
         
-        new_finance = Finance()
+        new_finance = Finance(category=finance.category, amount=finance.amount,
+                              user_id=finance.user_id,
+                              name_of_the_expenditure=finance.name_of_the_expenditure)
+        
+        
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

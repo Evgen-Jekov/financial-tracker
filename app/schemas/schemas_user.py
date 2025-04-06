@@ -7,6 +7,7 @@ class UserBase(BaseModel):
     email : EmailStr = Field(min_length=8, max_length=128)
 
 class UserResponses(BaseModel):
+    id : int = Field(gt=0)
     token : str
     create_at : datetime
     username : str = Field(min_length=3, max_length=50)

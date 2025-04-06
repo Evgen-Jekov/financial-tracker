@@ -14,14 +14,15 @@ route_user = APIRouter(prefix='/user', tags=['USER'])
 @route_user.post(path='/login', response_model=Token)
 def login_user(form_data : Annotated[OAuth2PasswordRequestForm, Depends()], 
                db : Annotated[Session, Depends(get_db)]):
-    email = db.query(User).filter(User.username == form_data.username).first()
+    user = db.query(User).filter(User.username == form_data.username).first()
 
-    if not email:
+    if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
 
     data_user = UserCreate(
+        id=user.id,
         username=form_data.username,
-        email=email.email,
+        email=user.email,
         password=form_data.password
         )
 
@@ -42,6 +43,7 @@ def register_user(data_user : UserCreate,
     print(user)
 
     result_user = UserResponses(
+        id=user['user'].id,
         token=user["token"],
         create_at=user["user"].create_at,
         username=user["user"].username,
@@ -63,6 +65,7 @@ def get_user_data(
 
     
     result_user = UserResponses(
+        id=current_user.id,
         token=token,
         create_at=current_user.create_at,
         email=current_user.email,

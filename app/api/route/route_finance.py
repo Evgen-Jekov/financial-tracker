@@ -14,14 +14,11 @@ route_finance = APIRouter(prefix='/finance', tags=['FINANCE'])
 def add_finance(finance : FinanceCreate,
                 db : Annotated[Session, Depends(get_db)],
                 token : Annotated[str, Depends(oauth2_scheme)]):
-    try:
-        data_user = get_current_user(token=token, db=db)
+    data_user = get_current_user(token=token, db=db)
 
-        if data_user.id != finance.user_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='You are not authorized to view this user')
+    if data_user.id != finance.user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='You are not authorized to view this user')
         
-        response = create_finance(data_finance=finance, db=db)
+    response = create_finance(data_finance=finance, db=db)
 
-        return response
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    return response

@@ -18,7 +18,8 @@ def create_finance(data_finance : FinanceCreate, db : Annotated[Session, Depends
 
         result = FinanceResponse(user_id=new_finance.user_id, category=new_finance.category,
                                 name_of_the_expenditure=new_finance.name_of_the_expenditure,
-                                amount=new_finance.amount, create_at=new_finance.create_at)
+                                amount=new_finance.amount, create_at=new_finance.create_at, 
+                                success=True)
 
         return result
     except SQLAlchemyError as e:

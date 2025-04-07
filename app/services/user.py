@@ -54,7 +54,7 @@ def authenticate_user(data_user : UserCreate, db : Annotated[Session, Depends(ge
     token_access = create_access_token(data={"sub" : data_user.username}, 
                                        expires_delta=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    return {'token' : Token(access_token=token_access, token_type="bearer"), 'user' : check}
+    return Token(access_token=token_access, token_type="bearer", user_id=check.id)
 
 def create_user(data_user : UserCreate, db : Annotated[Session, Depends(get_db)]):
     try:

@@ -5,7 +5,7 @@ from app.model.database import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Annotated
-from app.model.model import Finance
+from app.services.finance import create_finance
 
 route_finance = APIRouter(prefix='/finance', tags=['FINANCE'])
 
@@ -20,10 +20,8 @@ def add_finance(finance : FinanceCreate,
         if data_user.id != finance.user_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='You are not authorized to view this user')
         
-        new_finance = Finance(category=finance.category, amount=finance.amount,
-                              user_id=finance.user_id,
-                              name_of_the_expenditure=finance.name_of_the_expenditure)
-        
-        
+        response = create_finance(data_finance=finance, db=db)
+
+        return response
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

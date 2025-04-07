@@ -29,7 +29,7 @@ def login_user(form_data : Annotated[OAuth2PasswordRequestForm, Depends()],
     token = authenticate_user(data_user=data_user, db=db)
 
 
-    return token['token']
+    return token
 
 @route_user.post('/register', response_model=UserResponses)
 def register_user(data_user : UserCreate, 

@@ -4,7 +4,7 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from app.model.database import get_db
-from app.model.model import Finance
+from app.model.model import Finance, User
 
 def create_finance(data_finance : FinanceCreate, db : Annotated[Session, Depends(get_db)]):
     try:
@@ -22,5 +22,14 @@ def create_finance(data_finance : FinanceCreate, db : Annotated[Session, Depends
                                 success=True)
 
         return result
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+
+def get_all(data_user : User, db : Annotated[Session, Depends(get_db)]):
+    try:
+        finance = db.query(Finance).filter(Finance.user_id == data_user.id).all()
+
+        return finance
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

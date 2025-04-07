@@ -29,3 +29,6 @@ class FinanceResponse(FinanceCreate):
 
     class Config:
         from_attributes = True
+
+class FinanceList(BaseModel):
+    finance : list[FinanceResponse]

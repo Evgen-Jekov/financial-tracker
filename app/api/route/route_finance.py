@@ -4,7 +4,7 @@ from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceL
 from app.model.database import get_db
 from sqlalchemy.orm import Session
 from typing import Annotated
-from app.services.finance import create_finance, get_all, get_ctegory
+from app.services.finance import create_finance, get_all, get_category
 
 route_finance = APIRouter(prefix='/finance', tags=['FINANCE'])
 
@@ -48,7 +48,7 @@ def get_category(db : Annotated[Session, Depends(get_db)],
                 token : Annotated[str, Depends(oauth2_scheme)],
                 category : Annotated[str, Body()]):
     user = get_current_user(token=token, db=db)
-    category_all = get_ctegory(category=category, data_user=user, db=db)
+    category_all = get_category(category=category, data_user=user, db=db)
     list_category = []
 
     for cat in category_all:

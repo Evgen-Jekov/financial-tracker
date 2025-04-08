@@ -61,4 +61,4 @@ def get_category(db : Annotated[Session, Depends(get_db)],
             create_at=cat.create_at
         ))
 
-        return FinanceList(finance=list_category)
+    return FinanceList(finance=list_category)

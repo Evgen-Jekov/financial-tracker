@@ -1,4 +1,4 @@
-from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceUpdateFull
+from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceUpdateFull, FinanceUpdateOptional
 from fastapi import Depends, status, HTTPException
 from typing import Annotated
 from sqlalchemy.orm import Session
@@ -66,6 +66,30 @@ def update_full_finance(data_update : FinanceUpdateFull,
         return updated_finance
     except SQLAlchemyError as e:
         db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+def update_optional_finance(data_update : FinanceUpdateOptional, 
+                        data_user : User, id : int, 
+                        db : Annotated[Session, Depends(get_db)]):
+    try:
+        update_optional = {Finance.create_at : func.now()}
+
+        if data_update.name_of_the_expenditure is not None:
+            update_optional[Finance.name_of_the_expenditure] = data_update.name_of_the_expenditure
+        if data_update.category is not None:
+            update_optional[Finance.category] = data_update.category
+        if data_update.amount is not None:
+            update_optional[Finance.amount] = data_update.amount
+
+        db.query(Finance).filter(
+            Finance.user_id == data_user.id).filter(Finance.id == id).update(
+                update_optional, synchronize_session="fetch")
+    
+        updated_finance = db.query(Finance).filter(
+                Finance.user_id == data_user.id).filter(Finance.id == id).first()
+    
+        return updated_finance
+    except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
 

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Body, Path
 from app.services.user import get_current_user, oauth2_scheme
-from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceList, FinanceDelete,  FinanceUpdateFull
+from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceList, FinanceDelete,  FinanceUpdateFull, FinanceUpdateOptional
 from app.model.database import get_db
 from sqlalchemy.orm import Session
 from typing import Annotated
-from app.services.finance import create_finance, get_all, get_category, delete_finance, update_full_finance
+from app.services.finance import create_finance, get_all, get_category, delete_finance, update_full_finance, update_optional_finance
 
 route_finance = APIRouter(prefix='/finance', tags=['FINANCE'])
 
@@ -96,3 +96,19 @@ def update_all(db : Annotated[Session, Depends(get_db)],
                            id=update_finance.id,
                            success=True,
                            create_at=update_finance.create_at)
+
+
+@route_finance.patch('/update-finance-optional', response_model=FinanceResponse)
+def optional_update(data_update : FinanceUpdateOptional, id : int, 
+                    token : Annotated[str, Depends(oauth2_scheme)], 
+                    db : Annotated[Session, Depends(get_db)]):
+    user = get_current_user(token=token, db=db)
+    update = update_optional_finance(data_update=data_update, data_user=user, id=id, db=db)
+
+    return FinanceResponse(user_id=update.user_id,
+                           category=update.category,
+                           name_of_the_expenditure=update.name_of_the_expenditure,
+                           amount=update.amount,
+                           id=update.id,
+                           success=True,
+                           create_at=update.create_at)

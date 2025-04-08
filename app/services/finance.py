@@ -87,6 +87,8 @@ def update_optional_finance(data_update : FinanceUpdateOptional,
     
         updated_finance = db.query(Finance).filter(
                 Finance.user_id == data_user.id).filter(Finance.id == id).first()
+        
+        db.commit()
     
         return updated_finance
     except SQLAlchemyError as e:

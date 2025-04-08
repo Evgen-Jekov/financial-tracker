@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status, Body, Path
 from app.services.user import get_current_user, oauth2_scheme
-from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceList
+from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceList, FinanceDelete
 from app.model.database import get_db
 from sqlalchemy.orm import Session
 from typing import Annotated
-from app.services.finance import create_finance, get_all, get_category
+from app.services.finance import create_finance, get_all, get_category, delete_finance
 
 route_finance = APIRouter(prefix='/finance', tags=['FINANCE'])
 
@@ -62,3 +62,15 @@ def get_category(db : Annotated[Session, Depends(get_db)],
         ))
 
     return FinanceList(finance=list_category)
+
+@route_finance.delete('/delete-finance/{id}', response_model=FinanceDelete)
+def del_finance(db : Annotated[Session, Depends(get_db)],
+                token : Annotated[str, Depends(oauth2_scheme)],
+                id : Annotated[int, Path]):
+    user = get_current_user(token=token, db=db)
+    responses = delete_finance(data_user=user, id=id, db=db)
+
+    if responses:
+        return FinanceDelete(status='Success delete')
+    else:
+        return FinanceDelete(status='Unsuccess delete')

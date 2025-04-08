@@ -32,3 +32,6 @@ class FinanceResponse(FinanceCreate):
 
 class FinanceList(BaseModel):
     finance : list[FinanceResponse]
+
+class FinanceDelete(BaseModel):
+    status : Literal['Success delete', 'Unsuccess delete']

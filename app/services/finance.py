@@ -23,6 +23,23 @@ def create_finance(data_finance : FinanceCreate, db : Annotated[Session, Depends
 
         return result
     except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+def delete_finance(data_user : User ,id : int, db : Annotated[Session, Depends(get_db)]):
+    try:
+        del_finance = db.query(Finance).filter(Finance.user_id == data_user.id).filter(Finance.id == id).first()
+
+        if not del_finance:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='finance not found')
+
+        db.delete(del_finance)
+        db.commit()
+
+        return True
+
+    except SQLAlchemyError as e:
+        db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
 
@@ -38,6 +55,9 @@ def get_all(data_user : User, db : Annotated[Session, Depends(get_db)]):
 def get_category(category : str, data_user : User, db : Annotated[Session, Depends(get_db)]):
     try:
         categ = db.query(Finance).filter(Finance.user_id == data_user.id).filter(Finance.category == category).all()
+
+        if not categ:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='finance not found')
 
         return categ
     except SQLAlchemyError as e:

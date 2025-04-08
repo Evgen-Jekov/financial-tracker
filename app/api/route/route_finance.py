@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Body, Path
 from app.services.user import get_current_user, oauth2_scheme
-from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceList, FinanceDelete
+from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceList, FinanceDelete,  FinanceUpdateFull
 from app.model.database import get_db
 from sqlalchemy.orm import Session
 from typing import Annotated
-from app.services.finance import create_finance, get_all, get_category, delete_finance
+from app.services.finance import create_finance, get_all, get_category, delete_finance, update_full_finance
 
 route_finance = APIRouter(prefix='/finance', tags=['FINANCE'])
 
@@ -68,7 +68,7 @@ def get_category_user(db : Annotated[Session, Depends(get_db)],
 @route_finance.delete('/delete-finance/{id}', response_model=FinanceDelete)
 def del_finance(db : Annotated[Session, Depends(get_db)],
                 token : Annotated[str, Depends(oauth2_scheme)],
-                id : Annotated[int, Path]):
+                id : Annotated[int, Path()]):
     user = get_current_user(token=token, db=db)
     responses = delete_finance(data_user=user, id=id, db=db)
 
@@ -76,3 +76,23 @@ def del_finance(db : Annotated[Session, Depends(get_db)],
         return FinanceDelete(status='Success delete')
     else:
         return FinanceDelete(status='Unsuccess delete')
+    
+@route_finance.put('/update-finance-all/{id}', response_model=FinanceResponse)
+def update_all(db : Annotated[Session, Depends(get_db)],
+                token : Annotated[str, Depends(oauth2_scheme)],
+                id : Annotated[int, Path()], 
+                data_update : FinanceUpdateFull):
+    user = get_current_user(token=token, db=db)
+    update_finance = update_full_finance(data_update=data_update, 
+                                         data_user=user, id=id, db=db)
+    
+    if not update_all:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='finance not found')
+    
+    return FinanceResponse(user_id=update_finance.user_id,
+                           category=update_finance.category,
+                           name_of_the_expenditure=update_finance.name_of_the_expenditure,
+                           amount=update_finance.amount,
+                           id=update_finance.id,
+                           success=True,
+                           create_at=update_finance.create_at)

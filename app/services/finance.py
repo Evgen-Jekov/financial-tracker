@@ -1,7 +1,8 @@
-from app.schemas.schemas_finance import FinanceCreate, FinanceResponse
+from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceUpdateFull
 from fastapi import Depends, status, HTTPException
 from typing import Annotated
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 from sqlalchemy.exc import SQLAlchemyError
 from app.model.database import get_db
 from app.model.model import Finance, User
@@ -26,7 +27,7 @@ def create_finance(data_finance : FinanceCreate, db : Annotated[Session, Depends
         db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
-def delete_finance(data_user : User ,id : int, db : Annotated[Session, Depends(get_db)]):
+def delete_finance(data_user : User, id : int, db : Annotated[Session, Depends(get_db)]):
     try:
         del_finance = db.query(Finance).filter(Finance.user_id == data_user.id).filter(Finance.id == id).first()
 
@@ -38,6 +39,31 @@ def delete_finance(data_user : User ,id : int, db : Annotated[Session, Depends(g
 
         return True
 
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+def update_full_finance(data_update : FinanceUpdateFull, 
+                        data_user : User, id : int, 
+                        db : Annotated[Session, Depends(get_db)]):
+    try:
+        update_full_finance = db.query(Finance).filter(
+        Finance.user_id == data_user.id).filter(Finance.id == id).update(
+            {Finance.category : data_update.category,
+             Finance.amount : data_update.amount,
+             Finance.name_of_the_expenditure : data_update.name_of_the_expenditure,
+             Finance.create_at : func.now(),
+             }, synchronize_session="fetch")
+        
+        if update_full_finance == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="finance not found")
+        
+        db.commit()
+
+        updated_finance = db.query(Finance).filter(
+            Finance.user_id == data_user.id).filter(Finance.id == id).first()
+    
+        return updated_finance
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

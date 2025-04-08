@@ -36,3 +36,12 @@ class FinanceList(BaseModel):
 
 class FinanceDelete(BaseModel):
     status : Literal['Success delete', 'Unsuccess delete']
+
+class FinanceUpdateFull(BaseModel):
+    category : Literal['Food', 'Transport', 'Housing',
+                       'Health', 'Clothes and shoes', 'Entertainment and leisure',
+                       'Education', 'Gifts and charity', 'Pets',
+                       'Personal expenses', 'Trips', 'Savings and Investments', 
+                       'Other']
+    name_of_the_expenditure : str = Field(min_length=10, max_length=128)
+    amount : int = Field(gt=0)

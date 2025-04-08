@@ -16,6 +16,7 @@ class FinanceCreate(BaseModel):
         from_attributes = True
 
 class FinanceResponse(FinanceCreate):
+    id : int
     success : bool = True
     user_id : int = Field(gt=0)
     name_of_the_expenditure : str = Field(min_length=10, max_length=128)

@@ -38,13 +38,14 @@ def get_all_finance(db : Annotated[Session, Depends(get_db)],
             category=fin.category,
             name_of_the_expenditure=fin.name_of_the_expenditure,
             amount=fin.amount,
-            create_at=fin.create_at
+            create_at=fin.create_at,
+            id=fin.id
         ))
 
     return FinanceList(finance=list_fin)
 
 @route_finance.post('/get-category-finance', response_model=FinanceList)
-def get_category(db : Annotated[Session, Depends(get_db)],
+def get_category_user(db : Annotated[Session, Depends(get_db)],
                 token : Annotated[str, Depends(oauth2_scheme)],
                 category : Annotated[str, Body()]):
     user = get_current_user(token=token, db=db)
@@ -58,7 +59,8 @@ def get_category(db : Annotated[Session, Depends(get_db)],
             name_of_the_expenditure=cat.name_of_the_expenditure,
             amount=cat.amount,
             success=True,
-            create_at=cat.create_at
+            create_at=cat.create_at,
+            id=cat.id
         ))
 
     return FinanceList(finance=list_category)

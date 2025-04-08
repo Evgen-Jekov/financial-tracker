@@ -24,6 +24,8 @@ def create_finance(data_finance : FinanceCreate, db : Annotated[Session, Depends
         return result
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    finally:
+        db.close()
     
 
 def get_all(data_user : User, db : Annotated[Session, Depends(get_db)]):
@@ -33,3 +35,16 @@ def get_all(data_user : User, db : Annotated[Session, Depends(get_db)]):
         return finance
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    finally:
+        db.close()
+    
+
+def get_ctegory(category : str, data_user : User, db : Annotated[Session, Depends(get_db)]):
+    try:
+        categ = db.query(Finance).filter(Finance.user_id == data_user.id).filter(Finance.category == category).all()
+
+        return categ
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    finally:
+        db.close()

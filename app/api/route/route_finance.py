@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from app.services.user import get_current_user, oauth2_scheme
 from app.schemas.schemas_finance import FinanceCreate, FinanceResponse, FinanceList
 from app.model.database import get_db
 from sqlalchemy.orm import Session
 from typing import Annotated
-from app.services.finance import create_finance, get_all
+from app.services.finance import create_finance, get_all, get_ctegory
 
 route_finance = APIRouter(prefix='/finance', tags=['FINANCE'])
 
@@ -42,3 +42,23 @@ def get_all_finance(db : Annotated[Session, Depends(get_db)],
         ))
 
     return FinanceList(finance=list_fin)
+
+@route_finance.post('/get-category-finance', response_model=FinanceList)
+def get_category(db : Annotated[Session, Depends(get_db)],
+                token : Annotated[str, Depends(oauth2_scheme)],
+                category : Annotated[str, Body()]):
+    user = get_current_user(token=token, db=db)
+    category_all = get_ctegory(category=category, data_user=user, db=db)
+    list_category = []
+
+    for cat in category_all:
+        list_category.append(FinanceResponse(
+            user_id=cat.user_id,
+            category=cat.category,
+            name_of_the_expenditure=cat.name_of_the_expenditure,
+            amount=cat.amount,
+            success=True,
+            create_at=cat.create_at
+        ))
+
+        return FinanceList(finance=list_category)

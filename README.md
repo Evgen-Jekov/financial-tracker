@@ -117,7 +117,7 @@ curl -X POST http://localhost:8000/user/register \
 ## 👨‍💻 Author
 
 Crafted with ❤️ by **Evgen Jekov**  
-Feel free to connect: [GitHub](https://github.com/Evgen-Jekov) · [LinkedIn](#) · [Telegram](#)
+Feel free to connect: [GitHub](https://github.com/Evgen-Jekov) · [LinkedIn](https://www.linkedin.com/in/evgen-zhekov-881052357/)
 
 ---
 

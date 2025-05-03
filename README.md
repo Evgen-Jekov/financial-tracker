@@ -103,17 +103,6 @@ curl -X POST http://localhost:8000/user/register \
 - Fully documented via Swagger UI
 - Clean modular architecture with routers, services, and schemas
 
----
-
-## 💡 Future Enhancements
-
-- Data visualization with charts (D3.js, Chart.js)
-- Daily/weekly financial reports via email
-- Limit alerts and budget goals
-- Mobile-friendly frontend with React Native or Flutter
-
----
-
 ## 👨‍💻 Author
 
 Crafted with ❤️ by **Evgen Jekov**  

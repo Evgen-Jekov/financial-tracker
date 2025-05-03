@@ -20,7 +20,7 @@
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/finance-track.git
+git clone https://github.com/Evgen-Jekov/financial-tracker
 cd finance-track
 ```
 
@@ -117,7 +117,7 @@ curl -X POST http://localhost:8000/user/register \
 ## 👨‍💻 Author
 
 Crafted with ❤️ by **Evgen Jekov**  
-Feel free to connect: [GitHub](https://github.com/your-username) · [LinkedIn](#) · [Telegram](#)
+Feel free to connect: [GitHub](https://github.com/Evgen-Jekov) · [LinkedIn](#) · [Telegram](#)
 
 ---
 

@@ -107,9 +107,3 @@ curl -X POST http://localhost:8000/user/register \
 
 Crafted with ❤️ by **Evgen Jekov**  
 Feel free to connect: [GitHub](https://github.com/Evgen-Jekov) · [LinkedIn](https://www.linkedin.com/in/evgen-zhekov-881052357/)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
